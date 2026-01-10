@@ -1,20 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { CartContext } from "./contexts.jsx";
 import Cart from "./Cart";
 import Pizza from "./Pizza";
 
-// feel free to change en-US / USD to your locale
+// Formatter for USD currency
 const intl = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
 });
 
+// Order component
 export default function Order() {
   const [pizzaType, setPizzaType] = useState("pepperoni");
   const [pizzaSize, setPizzaSize] = useState("M");
+
+  // state to hold available pizza types
   const [pizzaTypes, setPizzaTypes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [cart, setCart] = useState([]);
 
+  // state to hold cart items
+  // const [cart, setCart] = useState(CartContext);
+  const [cart, setCart] = useContext(CartContext);
+
+
+  // function to handle checkout
   async function checkout() {
     setLoading(true);
 
@@ -31,7 +40,7 @@ export default function Order() {
     setCart([]);
     setLoading(false);
   }
-
+  // variables for selected pizza and its price
   let price, selectedPizza;
   if (!loading) {
     selectedPizza = pizzaTypes.find((pizza) => pizzaType === pizza.id);
@@ -40,10 +49,12 @@ export default function Order() {
     );
   }
 
+  // fetch pizza types on component mount
   useEffect(() => {
     fetchPizzaTypes();
   }, []);
 
+  // function to fetch pizza types
   async function fetchPizzaTypes() {
     const pizzasRes = await fetch("/api/pizzas");
     const pizzasJson = await pizzasRes.json();
@@ -51,6 +62,7 @@ export default function Order() {
     setLoading(false);
   }
 
+  // render order form and cart
   return (
     <div className="order-page">
       <div className="order">
