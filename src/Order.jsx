@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Pizza from "./Pizza";
 
-// Currency formatter
+// feel free to change en-US / USD to your locale
 const intl = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD"
+  style: "currency",
+  currency: "USD",
 });
 
 export default function Order() {
@@ -13,25 +13,23 @@ export default function Order() {
   const [pizzaTypes, setPizzaTypes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect (() => {
-    fetchPizzaTypes();
-  }, []); 
-
-  async function fetchPizzaTypes() {
-    const pizzaRes = await fetch("/api/pizzas");
-    const pizzaJson = await pizzaRes.json();
-    // Changed setPizzaType to setPizzaTypes 
-    setPizzaTypes(pizzaJson); 
-    setLoading (false);
-  }
-
-  let price, selectedPizza; // Spelling (was selectdPizza)
+  let price, selectedPizza;
   if (!loading) {
-    //  Using the corrected variable name from above
     selectedPizza = pizzaTypes.find((pizza) => pizzaType === pizza.id);
     price = intl.format(
-        selectedPizza.sizes ? selectedPizza.sizes[pizzaSize] : 0
+      selectedPizza.sizes ? selectedPizza.sizes[pizzaSize] : "",
     );
+  }
+
+  useEffect(() => {
+    fetchPizzaTypes();
+  }, []);
+
+  async function fetchPizzaTypes() {
+    const pizzasRes = await fetch("/api/pizzas");
+    const pizzasJson = await pizzasRes.json();
+    setPizzaTypes(pizzasJson);
+    setLoading(false);
   }
 
   return (
@@ -41,12 +39,11 @@ export default function Order() {
         <div>
           <div>
             <label htmlFor="pizza-type">Pizza Type</label>
-            <select 
-                name="pizza-type" 
-                value={pizzaType} 
-                onChange={(e) => setPizzaType(e.target.value)}
+            <select
+              onChange={(e) => setPizzaType(e.target.value)}
+              name="pizza-type"
+              value={pizzaType}
             >
-              {/* Map through real data instead of hardcoded options */}
               {pizzaTypes.map((pizza) => (
                 <option key={pizza.id} value={pizza.id}>
                   {pizza.name}
@@ -54,36 +51,54 @@ export default function Order() {
               ))}
             </select>
           </div>
-
-          <div onChange={(e) => setPizzaSize(e.target.value)}>
+          <div>
             <label htmlFor="pizza-size">Pizza Size</label>
             <div>
               <span>
-                <input checked={pizzaSize === "S"} type="radio" name="pizza-size" value="S" id="pizza-s" />
+                <input
+                  onChange={(e) => setPizzaSize(e.target.value)}
+                  checked={pizzaSize === "S"}
+                  type="radio"
+                  name="pizza-size"
+                  value="S"
+                  id="pizza-s"
+                />
                 <label htmlFor="pizza-s">Small</label>
               </span>
               <span>
-                <input checked={pizzaSize === "M"} type="radio" name="pizza-size" value="M" id="pizza-m" />
+                <input
+                  onChange={(e) => setPizzaSize(e.target.value)}
+                  checked={pizzaSize === "M"}
+                  type="radio"
+                  name="pizza-size"
+                  value="M"
+                  id="pizza-m"
+                />
                 <label htmlFor="pizza-m">Medium</label>
               </span>
               <span>
-                <input checked={pizzaSize === "L"} type="radio" name="pizza-size" value="L" id="pizza-l" />
+                <input
+                  onChange={(e) => setPizzaSize(e.target.value)}
+                  checked={pizzaSize === "L"}
+                  type="radio"
+                  name="pizza-size"
+                  value="L"
+                  id="pizza-l"
+                />
                 <label htmlFor="pizza-l">Large</label>
               </span>
             </div>
           </div>
           <button type="submit">Add to Cart</button>
         </div>
-        
-        {/*  Only show Pizza info if NOT loading */}
         {loading ? (
-          <h3>Loading...</h3>
+          <h3>LOADING …</h3>
         ) : (
           <div className="order-pizza">
             <Pizza
-              name={selectedPizza.name} 
+              name={selectedPizza.name}
               description={selectedPizza.description}
-              image={selectedPizza.image} 
+              image={selectedPizza.image}
             />
             <p>{price}</p>
           </div>
